@@ -126,21 +126,39 @@ function Connect-CohesityCluster {
         throw "Cluster name cannot be empty."
     }
     
-    # Remove protocol if provided and ensure HTTPS
+    # Handle protocol specification
     $ClusterName = $ClusterName.Trim()
     if ($ClusterName.StartsWith("http://")) {
-        $ClusterName = $ClusterName.Substring(7)
         Write-FormattedOutput "Warning: HTTP protocol detected. Converting to HTTPS for security." "Warning"
+        $ClusterName = "https://$($ClusterName.Substring(7))"
     }
-    elseif (-not $ClusterName.StartsWith("https://")) {
-        $ClusterName = "https://$ClusterName"
+    elseif ($ClusterName.StartsWith("https://")) {
+        # Already has HTTPS protocol, keep as is
+    }
+    else {
+        # No protocol specified, try HTTPS first, then HTTP if that fails
+        $HttpsUrl = "https://$ClusterName"
+        $HttpUrl = "http://$ClusterName"
+        
+        Write-Verbose "Testing HTTPS connectivity first..."
+        if (Test-UrlReachability -Url $HttpsUrl) {
+            $ClusterName = $HttpsUrl
+            Write-FormattedOutput "Using HTTPS protocol for cluster connection" "Info"
+        }
+        else {
+            Write-Verbose "HTTPS failed, testing HTTP connectivity..."
+            if (Test-UrlReachability -Url $HttpUrl) {
+                $ClusterName = $HttpUrl
+                Write-FormattedOutput "Using HTTP protocol for cluster connection" "Warning"
+            }
+            else {
+                throw "Cluster $ClusterName is not reachable via HTTPS or HTTP. Please check the cluster name and network connectivity."
+            }
+        }
     }
     
-    # Test cluster reachability
-    Write-Verbose "Testing cluster reachability..."
-    if (-not (Test-UrlReachability -Url $ClusterName)) {
-        throw "Cluster $ClusterName is not reachable. Please check the cluster name and network connectivity."
-    }
+    # Cluster reachability already tested during protocol selection
+    Write-Verbose "Cluster reachability verified during protocol selection"
     
     # Convert secure string to plain text
     $PlainPassword = Convert-SecureStringToPlainText -SecureString $Password
