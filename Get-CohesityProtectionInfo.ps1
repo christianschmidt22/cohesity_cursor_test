@@ -333,7 +333,7 @@ function Get-CohesityProtectionRuns {
             }
         }
         catch {
-            Write-FormattedOutput "Failed to retrieve protection runs for job $JobId: $($_.Exception.Message)" "Warning"
+            Write-FormattedOutput "Failed to retrieve protection runs for job $JobId`: $($_.Exception.Message)" "Warning"
         }
     }
     
@@ -403,10 +403,10 @@ function Format-CohesityOutput {
             } else { "Never" }
             
             $Status = switch ($Job.lastRunStatus) {
-                "kSuccess" { "✓ Success" }
-                "kFailure" { "✗ Failed" }
-                "kRunning" { "⟳ Running" }
-                default { "? Unknown" }
+                "kSuccess" { "Success" }
+                "kFailure" { "Failed" }
+                "kRunning" { "Running" }
+                default { "Unknown" }
             }
             
             Write-Host "  - $($Job.name) [$Status] - Last Run: $LastRunTime"
@@ -449,7 +449,7 @@ function Format-CohesityOutput {
         $RunStatuses = $ProtectionRuns | Group-Object -Property "backupRun.status" | Sort-Object Count -Descending
         foreach ($Status in $RunStatuses) {
             $StatusName = if ($Status.Name) { $Status.Name } else { "Unknown" }
-            Write-Host "  - $StatusName: $($Status.Count) runs"
+            Write-Host "  - $StatusName`: $($Status.Count) runs"
         }
     }
     
