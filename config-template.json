@@ -1,0 +1,36 @@
+{
+  "cluster": {
+    "name": "your-cluster-name-or-ip",
+    "port": 443,
+    "protocol": "https",
+    "timeout": 30,
+    "maxRetries": 3
+  },
+  "api": {
+    "version": "v1",
+    "endpoints": {
+      "authentication": "/irisservices/api/v1/public/accessTokens",
+      "protectionJobs": "/irisservices/api/v1/public/protectionJobs",
+      "protectionRuns": "/irisservices/api/v1/public/protectionRuns",
+      "protectedSources": "/irisservices/api/v1/public/protectedSources"
+    }
+  },
+  "query": {
+    "defaultTimeRange": 30,
+    "maxResults": 1000,
+    "includeDeleted": false
+  },
+  "output": {
+    "defaultFormat": "console",
+    "exportFormats": ["json", "csv"],
+    "includeTimestamp": true,
+    "includeMetadata": true
+  },
+  "logging": {
+    "level": "Info",
+    "includeTimestamp": true,
+    "logToFile": false,
+    "logFilePath": "./cohesity-query.log"
+  }
+}
+
